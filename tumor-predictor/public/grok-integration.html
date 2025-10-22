@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grok Integration</title>
+</head>
+<body>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        // Initialize Puter/Grok for the React app
+        window.addEventListener('load', () => {
+            if (window.puter && window.puter.ai) {
+                console.log('Grok-4 available via Puter');
+                // Make it globally available
+                window.grokAvailable = true;
+            } else {
+                console.log('Grok not available, will use local backend');
+                window.grokAvailable = false;
+            }
+        });
+    </script>
+</body>
+</html>

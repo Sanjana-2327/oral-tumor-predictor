@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Active Button</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">Test Active Profile Button</h1>
+        
+        <!-- Test the active button -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i data-lucide="user" class="text-white" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">Dr. Sarah Mitchell</h2>
+                        <p class="text-blue-100">Head & Neck Oncology • City General Hospital</p>
+                        <p class="text-sm text-blue-200">License: MD-78452</p>
+                    </div>
+                </div>
+                <button
+                    onclick="handleProfileClick()"
+                    class="px-6 py-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all duration-200 flex items-center space-x-2 text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                >
+                    <i data-lucide="user" class="text-white" style="width: 18px; height: 18px;"></i>
+                    <span>View Profile</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Status display -->
+        <div id="status" class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-gray-600">Click the "View Profile" button above to test it!</p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-8 bg-blue-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-blue-900 mb-2">Button Features:</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>✅ Hover effect with scale and shadow</li>
+                <li>✅ Active state with scale down</li>
+                <li>✅ Smooth transitions</li>
+                <li>✅ Click handler functionality</li>
+                <li>✅ Visual feedback</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        function handleProfileClick() {
+            const status = document.getElementById('status');
+            status.innerHTML = `
+                <div class="text-green-600">
+                    <h3 class="text-lg font-semibold mb-2">✅ Button is Active!</h3>
+                    <p>Profile button clicked successfully!</p>
+                    <p class="text-sm mt-2">This would typically navigate to the profile section.</p>
+                </div>
+            `;
+            
+            // Add some visual feedback
+            status.classList.add('bg-green-50', 'border', 'border-green-200');
+            
+            // Reset after 3 seconds
+            setTimeout(() => {
+                status.innerHTML = '<p class="text-gray-600">Click the "View Profile" button above to test it!</p>';
+                status.classList.remove('bg-green-50', 'border', 'border-green-200');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

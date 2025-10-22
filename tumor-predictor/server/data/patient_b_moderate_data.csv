@@ -1,0 +1,11 @@
+Patient_ID,Age,Gender,stage,tumor_size_cm,Recurrence,treatment_type,response,Smoking_Status,Alcohol_Use,Oral_Hygiene,HPV_Status,Comorbidities,month_index
+B001,54,Female,T2N1M0,2.5,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,1
+B001,54,Female,T2N1M0,2.5,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,2
+B001,54,Female,T2N1M0,2.4,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,3
+B001,54,Female,T2N1M0,2.3,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,4
+B001,54,Female,T2N1M0,2.2,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,5
+B001,54,Female,T2N1M0,2.1,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,6
+B001,54,Female,T2N1M0,2.0,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,7
+B001,54,Female,T2N1M0,1.9,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,8
+B001,54,Female,T2N1M0,1.8,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,9
+B001,54,Female,T2N1M0,1.7,No,Surgery+RT,Good,Quit 1.5 years ago,Moderate,Fair,Positive,,10

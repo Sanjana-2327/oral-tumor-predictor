@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tumor-predictor</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+      // Initialize Puter/Grok for the React app
+      window.addEventListener('load', () => {
+        if (window.puter && window.puter.ai) {
+          console.log('Grok-4 available via Puter');
+          window.grokAvailable = true;
+        } else {
+          console.log('Grok not available, will use fallback responses');
+          window.grokAvailable = false;
+        }
+      });
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
