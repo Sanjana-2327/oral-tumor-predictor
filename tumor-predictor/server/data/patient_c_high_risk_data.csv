@@ -1,11 +1,11 @@
-Patient_ID,Age,Gender,Stage_TNM,Tumor_Size_cm,Recurrence,Treatment_Type,Response_to_Treatment,Smoking_Status,Alcohol_Use,Oral_Hygiene,HPV_Status,Comorbidities,Follow_Up_Month
-C001,45,Male,T1N0M0,1.2,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,1
-C001,45,Male,T1N0M0,1.0,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,2
-C001,45,Male,T1N0M0,0.9,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,3
-C001,45,Male,T1N0M0,0.8,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,4
-C001,45,Male,T1N0M0,0.8,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,5
-C001,45,Male,T1N0M0,0.7,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,6
-C001,45,Male,T1N0M0,0.7,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,7
-C001,45,Male,T1N0M0,0.7,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,8
-C001,45,Male,T1N0M0,0.6,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,9
-C001,45,Male,T1N0M0,0.6,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,None,10
+Patient_ID,Age,Gender,stage,tumor_size_cm,Recurrence,treatment_type,response,Smoking_Status,Alcohol_Use,Oral_Hygiene,HPV_Status,Comorbidities,month_index
+C001,45,Male,T1N0M0,1.2,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,1
+C001,45,Male,T1N0M0,1.0,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,2
+C001,45,Male,T1N0M0,0.9,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,3
+C001,45,Male,T1N0M0,0.8,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,4
+C001,45,Male,T1N0M0,0.8,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,5
+C001,45,Male,T1N0M0,0.7,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,6
+C001,45,Male,T1N0M0,0.7,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,7
+C001,45,Male,T1N0M0,0.7,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,8
+C001,45,Male,T1N0M0,0.6,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,9
+C001,45,Male,T1N0M0,0.6,No,Surgery Only,Excellent,Current Smoker,Heavy Daily,Very Poor,Negative,,10

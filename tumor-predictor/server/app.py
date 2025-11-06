@@ -84,6 +84,226 @@ async def ingest(file: UploadFile = File(...)):
     return {"rows": int(df.shape[0]), "path": save_path}
 
 
+@app.post("/image-ingest")
+async def image_ingest(image: UploadFile = File(...)):
+    """Accept an image upload from the doctor and persist it for later processing.
+
+    For the demo, we store the image under data/uploads/images and return basic metadata.
+    """
+    # Basic validation
+    allowed_ext = (".png", ".jpg", ".jpeg", ".bmp", ".gif")
+    lower_name = image.filename.lower()
+    if not any(lower_name.endswith(ext) for ext in allowed_ext):
+        raise HTTPException(status_code=400, detail="Only image files are supported (png, jpg, jpeg, bmp, gif)")
+
+    # Ensure directory exists
+    base_dir = os.path.join("data", "uploads", "images")
+    os.makedirs(base_dir, exist_ok=True)
+
+    # Save the file
+    content = await image.read()
+    save_path = os.path.join(base_dir, image.filename)
+    with open(save_path, "wb") as f:
+        f.write(content)
+
+    # Lightweight metadata (no heavy processing for demo)
+    size_bytes = len(content)
+    return {
+        "message": "Image uploaded successfully",
+        "filename": image.filename,
+        "path": save_path,
+        "size_bytes": size_bytes,
+    }
+
+
+@app.post("/image-ingest-batch")
+async def image_ingest_batch(images: List[UploadFile] = File(...)):
+    """Accept multiple image uploads and persist them for later processing."""
+    if not images:
+        raise HTTPException(status_code=400, detail="No images provided")
+
+    allowed_ext = (".png", ".jpg", ".jpeg", ".bmp", ".gif")
+    base_dir = os.path.join("data", "uploads", "images")
+    os.makedirs(base_dir, exist_ok=True)
+
+    saved = []
+    for img in images:
+        lower_name = img.filename.lower()
+        if not any(lower_name.endswith(ext) for ext in allowed_ext):
+            raise HTTPException(status_code=400, detail=f"Unsupported file type: {img.filename}")
+        content = await img.read()
+        save_path = os.path.join(base_dir, img.filename)
+        with open(save_path, "wb") as f:
+            f.write(content)
+        saved.append({
+            "filename": img.filename,
+            "path": save_path,
+            "size_bytes": len(content),
+        })
+
+    return {
+        "message": "Images uploaded successfully",
+        "count": len(saved),
+        "files": saved,
+    }
+
+
+class AnalyzeRequest(BaseModel):
+    csv_path: str
+    image_files: Optional[List[str]] = None
+    treatment: Optional[str] = None
+
+
+@app.post("/analyze")
+def analyze(req: AnalyzeRequest):
+    """Analyze an uploaded CSV (and optional images) and return dashboard-ready data."""
+    if not os.path.exists(req.csv_path):
+        raise HTTPException(status_code=400, detail="CSV path not found")
+
+    try:
+        df = pd.read_csv(req.csv_path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to read CSV: {e}")
+
+    # Normalize expected column names
+    colmap = {
+        "Follow_Up_Month": "month_index",
+        "Tumor_Size_cm": "tumor_size_cm",
+        "Stage_TNM": "stage",
+        "Treatment_Type": "treatment_type",
+        "Response_to_Treatment": "response",
+    }
+    for k, v in colmap.items():
+        if k in df.columns and v not in df.columns:
+            df.rename(columns={k: v}, inplace=True)
+
+    if "tumor_size_cm" not in df.columns:
+        raise HTTPException(status_code=400, detail="CSV must include tumor_size_cm (or Tumor_Size_cm)")
+
+    # Order by month if available
+    if "month_index" in df.columns:
+        df = df.sort_values(by=["month_index"]).reset_index(drop=True)
+        months = [f"Month {int(m)}" for m in df["month_index"].fillna(0).astype(int).tolist()]
+    else:
+        months = [f"Month {i}" for i in range(len(df))]
+
+    sizes_series = df["tumor_size_cm"].astype(float)
+    sizes_series = sizes_series.fillna(method="ffill").fillna(method="bfill")
+    sizes = sizes_series.tolist()
+    # Optional stage from CSV
+    stage_value = None
+    if "stage" in df.columns:
+        try:
+            # Use the most common or first non-null stage
+            stage_value = df["stage"].dropna().astype(str).iloc[0] if df["stage"].dropna().size > 0 else None
+        except Exception:
+            stage_value = None
+
+    # Build evolution from historical CSV data
+    treatment = req.treatment or "chemo"
+    evolution = []
+    for i, (m, sz) in enumerate(zip(months, sizes)):
+        survival = 100 - i * 2 + (5 if treatment == "combined" else 0)
+        evolution.append({
+            "month": m,
+            "tumorSize": round(max(0.1, float(sz)), 2),
+            "survivalProb": round(min(100.0, max(40.0, float(survival))), 1),
+        })
+
+    # Extend evolution with ML predictions if model available (or train on the fly)
+    model = load_model("artifacts") if load_model else None
+    if model is None and train_and_save is not None:
+        try:
+            # Train using all CSVs currently under data/
+            train_and_save("data", "artifacts", lookback=3, epochs=10, batch_size=16)
+            model = load_model("artifacts") if load_model else None
+        except Exception:
+            model = None
+    if model is not None and predict_trajectory is not None and len(sizes) > 0:
+        horizon = 12
+        start_size = float(sizes[-1])
+        preds = predict_trajectory(model, start_size=start_size, months=horizon, lookback=3)
+        # Skip the first element if it's essentially the start point duplicated
+        pred_sizes = preds[1:] if len(preds) > 1 else preds
+        # Determine numeric month for continuation
+        next_index_base = 0
+        try:
+            if "month_index" in df.columns:
+                next_index_base = int(df["month_index"].dropna().astype(int).max())
+            else:
+                next_index_base = len(sizes) - 1
+        except Exception:
+            next_index_base = len(sizes) - 1
+        for j, sz in enumerate(pred_sizes, start=1):
+            idx = next_index_base + j
+            survival = 100 - idx * 2 + (5 if treatment == "combined" else 0)
+            evolution.append({
+                "month": f"Month {idx}",
+                "tumorSize": round(max(0.1, float(sz)), 2),
+                "survivalProb": round(min(100.0, max(40.0, float(survival))), 1),
+            })
+
+    # Enhanced risk factors based on the CSV and number of images
+    baseline = max(0.1, sizes[0])
+    last = max(0.1, sizes[-1])
+    growth_ratio = last / baseline
+    months_count = max(1, len(sizes) - 1)
+    growth_rate_pm = (last - baseline) / months_count
+
+    # Response distribution (if present)
+    response_mix = None
+    response_impact = 0
+    if "response" in df.columns:
+        counts = df["response"].dropna().astype(str).str.lower().value_counts().to_dict()
+        total_r = sum(counts.values()) or 1
+        good_like = (counts.get("excellent", 0) + counts.get("good", 0)) / total_r
+        response_impact = int((1 - good_like) * 100)
+        response_mix = {k: int(v) for k, v in counts.items()}
+
+    # Stage severity (if present)
+    stage_severity = 0
+    stage_str = None
+    if stage_value:
+        stage_str = str(stage_value)
+        # crude parse: look for T[1-4]
+        import re
+        m = re.search(r"T(\d)", stage_str.upper())
+        if m:
+            t_num = int(m.group(1))
+            stage_severity = min(100, 25 * max(0, t_num - 1))
+
+    risk_factors = [
+        {"factor": "Tumor Size Trend", "impact": min(100, int(growth_ratio * 50)), "description": "Relative growth from first to last"},
+        {"factor": "Growth Rate (/mo)", "impact": min(100, int(abs(growth_rate_pm) * 30)), "description": "Absolute monthly growth magnitude"},
+    ]
+    if stage_str is not None:
+        risk_factors.append({"factor": "Stage Severity", "impact": stage_severity, "description": f"Stage parsed from CSV: {stage_str}"})
+    if response_mix is not None:
+        risk_factors.append({"factor": "Treatment Response Mix", "impact": response_impact, "description": f"Distribution: {response_mix}"})
+
+    # Detailed levels
+    def to_level(score: int) -> str:
+        return "High" if score >= 70 else ("Medium" if score >= 40 else "Low")
+
+    risk_details = [
+        {"factor": rf["factor"], "score": rf["impact"], "level": to_level(int(rf["impact"])), "description": rf.get("description", "")}
+        for rf in risk_factors
+    ]
+
+    overall_score = int(np.mean([int(rf["impact"]) for rf in risk_factors]) if risk_factors else 0)
+    overall_risk = to_level(overall_score)
+
+    return {
+        "evolution": evolution,
+        "riskFactors": risk_factors,
+        "treatmentImpact": 92 if treatment == "combined" else (78 if treatment == "chemo" else 74),
+        "confidence": round(min(0.98, 0.65 + 0.02 * len(evolution) + (0.05 if model is not None else 0)), 2),
+        "stage": stage_value,
+        "riskDetails": risk_details,
+        "overallRisk": overall_risk,
+    }
+
+
 @app.post("/predict")
 def predict(state: PatientState):
     # If a trained TF model exists, use it; otherwise use demo logic

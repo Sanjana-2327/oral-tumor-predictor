@@ -1,0 +1,2 @@
+patient_id,age,sex,site,histology,tumor_size_cm,depth_of_invasion_mm,t_category,n_category,m_category,stage_group,hpv_status,smoking_status,alcohol_use,treatment,diagnosis_date,follow_up_months,status
+OC1001,45,M,floor_of_mouth,squamous_cell_carcinoma,1.5,1.1,T1,N0,M0,I,unknown,never,heavy,radiation,2019-10-14,7,alive

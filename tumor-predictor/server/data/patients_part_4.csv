@@ -1,0 +1,6 @@
+patient_id,age,sex,site,histology,tumor_size_cm,depth_of_invasion_mm,t_category,n_category,m_category,stage_group,hpv_status,smoking_status,alcohol_use,treatment,diagnosis_date,follow_up_months,status
+OC1019,38.0,F,tongue,verrucous_carcinoma,6.0,23.7,T4b,N1,M0,IVA,negative,former,moderate,immunotherapy,3/7/2025,40.0,alive
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,

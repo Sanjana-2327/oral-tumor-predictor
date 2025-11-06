@@ -1,0 +1,6 @@
+patient_id,age,sex,site,histology,tumor_size_cm,depth_of_invasion_mm,t_category,n_category,m_category,stage_group,hpv_status,smoking_status,alcohol_use,treatment,diagnosis_date,follow_up_months,status
+OC1021,43.0,M,hard_palate,squamous_cell_carcinoma,3.4,23.6,T4a,N2,M0,IVA,negative,current,heavy,radiation,5/7/2023,43.0,alive
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
